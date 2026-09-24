@@ -6,6 +6,7 @@ import '../models/driver.dart';
 import '../models/trip.dart';
 import '../models/attendance.dart';
 import '../models/payroll.dart';
+import '../models/booking.dart';
 
 class FleetProvider with ChangeNotifier {
   List<Bus> _buses = [];
@@ -13,6 +14,7 @@ class FleetProvider with ChangeNotifier {
   List<Trip> _trips = [];
   List<Attendance> _attendance = [];
   List<Payroll> _payrolls = [];
+  List<Booking> _bookings = [];
 
   bool _isLoading = true;
   final String _institutionName = 'مؤسسة سويقات أبو طالب';
@@ -30,6 +32,7 @@ class FleetProvider with ChangeNotifier {
   int get selectedMonth => _selectedMonth;
   int get selectedYear => _selectedYear;
   WorkShiftPattern get defaultShiftPattern => _defaultShiftPattern;
+  List<Booking> get bookings => _bookings;
 
   String get selectedMonthName {
     const months = [
@@ -482,6 +485,12 @@ class FleetProvider with ChangeNotifier {
               .map((item) => Payroll.fromMap(item))
               .toList();
         }
+        final bookJson = prefs.getString('fleet_bookings');
+        if (bookJson != null) {
+          _bookings = (json.decode(bookJson) as List)
+              .map((item) => Booking.fromMap(item))
+              .toList();
+        }
       } else {
         _seedInitialData();
       }
@@ -506,7 +515,38 @@ class FleetProvider with ChangeNotifier {
           'fleet_attendance', json.encode(_attendance.map((a) => a.toMap()).toList()));
       await prefs.setString(
           'fleet_payrolls', json.encode(_payrolls.map((p) => p.toMap()).toList()));
+      await prefs.setString(
+          'fleet_bookings', json.encode(_bookings.map((b) => b.toMap()).toList()));
     } catch (_) {}
+  }
+
+  // ==================== BOOKING OPERATIONS ====================
+  int getBookedSeatsForBus(String busId, DateTime date) {
+    int total = 0;
+    for (final b in _bookings) {
+      if (b.busId == busId &&
+          b.travelDate.year == date.year &&
+          b.travelDate.month == date.month &&
+          b.travelDate.day == date.day) {
+        total += b.seatsCount;
+      }
+    }
+    return total;
+  }
+
+  int getRemainingSeatsForBus(String busId, DateTime date) {
+    final bus = getBusById(busId);
+    final capacity = bus?.capacity ?? 50;
+    final booked = getBookedSeatsForBus(busId, date);
+    final remaining = capacity - booked;
+    return remaining < 0 ? 0 : remaining;
+  }
+
+  Future<bool> addBooking(Booking booking) async {
+    _bookings.insert(0, booking);
+    await _saveData();
+    notifyListeners();
+    return true;
   }
 
   void _seedInitialData() {
@@ -562,6 +602,16 @@ class FleetProvider with ChangeNotifier {
     ];
 
     _buses = [
+      Bus(
+        id: 'b12',
+        busNumber: 'الخط 1: مسار الحافلة 12 (01452-116-16)',
+        plateNumber: '01452-116-16',
+        capacity: 50,
+        model: 'مرسيدس توريزمو سعة 50 مقعد',
+        assignedDriverId: 'd1',
+        status: BusStatus.active,
+        currentMileage: 124500,
+      ),
       Bus(
         id: 'b1',
         busNumber: 'حافلة 101 (سوبر VIP)',
