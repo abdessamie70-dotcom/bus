@@ -7,7 +7,6 @@ class AppHeader extends StatelessWidget {
   final int selectedTabIndex;
   final ValueChanged<int> onTabSelected;
   final VoidCallback? onOpenDrivers;
-  final VoidCallback? onOpenBooking;
   final VoidCallback? onRecordTrip;
 
   const AppHeader({
@@ -15,7 +14,6 @@ class AppHeader extends StatelessWidget {
     required this.selectedTabIndex,
     required this.onTabSelected,
     this.onOpenDrivers,
-    this.onOpenBooking,
     this.onRecordTrip,
   });
 
@@ -49,7 +47,7 @@ class AppHeader extends StatelessWidget {
           // Top Row: Brand, Institution Badge, and Quick Action Buttons
           Row(
             children: [
-              // Left action buttons: Work Shift Pattern Selector + Gregorian Calendar Month & Year Picker + Booking Portal Button
+              // Left action buttons: Work Shift Pattern Selector + Gregorian Calendar Month & Year Picker
               Wrap(
                 spacing: 8,
                 runSpacing: 6,
@@ -60,21 +58,6 @@ class AppHeader extends StatelessWidget {
 
                   // 2. التقويم الميلادي شهر وسنة (بديل بوابة الحجز)
                   _buildGregorianMonthYearPicker(context, provider),
-
-                  // 3. زر بوابة الحجز المباشر (مثل الصورة)
-                  ElevatedButton.icon(
-                    onPressed: onOpenBooking ?? () => onTabSelected(6),
-                    icon: const Icon(Icons.confirmation_number_outlined, size: 15),
-                    label: const Text('بوابة الحجز'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: selectedTabIndex == 6 ? Colors.white : const Color(0xFFF59E0B),
-                      foregroundColor: selectedTabIndex == 6 ? const Color(0xFF1E3A8A) : Colors.white,
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-                    ),
-                  ),
                 ],
               ),
 
@@ -172,11 +155,6 @@ class AppHeader extends StatelessWidget {
                   index: 5,
                   label: 'دليل السائقين',
                   icon: Icons.badge_rounded,
-                ),
-                _buildNavTab(
-                  index: 6,
-                  label: 'بوابة الحجز',
-                  icon: Icons.confirmation_number_rounded,
                 ),
               ],
             ),

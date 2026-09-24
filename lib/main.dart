@@ -8,7 +8,6 @@ import 'views/fleet_screen.dart';
 import 'views/attendance_screen.dart';
 import 'views/payroll_screen.dart';
 import 'views/drivers_screen.dart';
-import 'views/booking_screen.dart';
 import 'widgets/app_header.dart';
 import 'widgets/record_trip_dialog.dart';
 
@@ -88,9 +87,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
       const AttendanceScreen(),
       const PayrollScreen(),
       const DriversScreen(),
-      BookingScreen(
-        onNavigateToDashboard: () => _onTabSelected(0),
-      ),
     ];
 
     return Scaffold(
@@ -102,7 +98,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
               selectedTabIndex: _currentTabIndex,
               onTabSelected: _onTabSelected,
               onOpenDrivers: () => _onTabSelected(5),
-              onOpenBooking: () => _onTabSelected(6),
               onRecordTrip: () {
                 showDialog(
                   context: context,
