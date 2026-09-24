@@ -34,8 +34,11 @@ jobs:
       - name: 📦 Install Dependencies
         run: flutter pub get
 
+      - name: 📜 Accept Android Licenses
+        run: yes | flutter doctor --android-licenses || true
+
       - name: 🏗️ Build Android Release APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release --no-tree-shake-icons --verbose
 
       - name: 🏷️ Rename APK
         run: cp build/app/outputs/flutter-apk/app-release.apk Souikat_Bus_Fleet_v1.2.0.apk
@@ -51,7 +54,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
           files: Souikat_Bus_Fleet_v1.2.0.apk
-          name: "إصدار تطبيق أسطول الحافلات APK v1.2.0"
+          name: "تطبيق أسطول الحافلات APK v1.2.0"
           tag_name: "v1.2.0"
           make_latest: true
           body: |
