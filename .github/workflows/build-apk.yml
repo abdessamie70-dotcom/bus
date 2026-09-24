@@ -25,6 +25,9 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      - name: 📱 Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: 🐦 Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -35,7 +38,7 @@ jobs:
         run: flutter pub get
 
       - name: 🏗️ Build Android Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: 🏷️ Rename APK
         run: cp build/app/outputs/flutter-apk/app-release.apk Souikat_Bus_Fleet_v1.0.apk
@@ -48,14 +51,16 @@ jobs:
 
       - name: 🚀 Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
         with:
           files: Souikat_Bus_Fleet_v1.0.apk
-          name: "إصدار تطبيق أسطول الحافلات v1.0"
+          name: "إصدار تطبيق أسطول الحافلات APK"
+          tag_name: "v1.1.2"
           body: |
             ### 🚌 تطبيق إدارة أسطول حافلات النقل ومتابعة السائقين
             **مؤسسة سويقات أبو طالب**
             
+            - 🎫 بوابة الحجز المباشر وتأكيد التذاكر الإلكترونية
             - 📅 تقويم الحضور والانصراف مع شريط اختيار السائقين السريع
             - 🔄 أنظمة العمل الأربعة (1:1، 1:2، شهر عمل، 2:1) مع الملء التلقائي
             - 🚌 متابعة حافلات 50 مقعد ونسب الإشغال
