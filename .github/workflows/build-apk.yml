@@ -1,0 +1,66 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 🐦 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: 🏗️ Build Android Release APK
+        run: flutter build apk --release
+
+      - name: 🏷️ Rename APK
+        run: cp build/app/outputs/flutter-apk/app-release.apk Souikat_Bus_Fleet_v1.0.apk
+
+      - name: 📤 Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Souikat_Bus_Fleet_APK
+          path: Souikat_Bus_Fleet_v1.0.apk
+
+      - name: 🚀 Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          files: Souikat_Bus_Fleet_v1.0.apk
+          name: "إصدار تطبيق أسطول الحافلات v1.0"
+          body: |
+            ### 🚌 تطبيق إدارة أسطول حافلات النقل ومتابعة السائقين
+            **مؤسسة سويقات أبو طالب**
+            
+            - 📅 تقويم الحضور والانصراف مع شريط اختيار السائقين السريع
+            - 🔄 أنظمة العمل الأربعة (1:1، 1:2، شهر عمل، 2:1) مع الملء التلقائي
+            - 🚌 متابعة حافلات 50 مقعد ونسب الإشغال
+            - 💰 حساب وطباعة كشوف الأجور الشهرية والأجر الإضافي
+            
+            **📥 رابط تنزيل ملف APK المباشر مرفق بالأسفل.**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
