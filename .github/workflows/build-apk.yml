@@ -21,12 +21,9 @@ jobs:
       - name: ☕ Set up Java JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
-
-      - name: 📱 Set up Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: 🐦 Set up Flutter
         uses: subosito/flutter-action@v2
@@ -41,31 +38,31 @@ jobs:
         run: flutter build apk --release --no-tree-shake-icons
 
       - name: 🏷️ Rename APK
-        run: cp build/app/outputs/flutter-apk/app-release.apk Souikat_Bus_Fleet_v1.0.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk Souikat_Bus_Fleet_v1.2.0.apk
 
       - name: 📤 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Souikat_Bus_Fleet_APK
-          path: Souikat_Bus_Fleet_v1.0.apk
+          path: Souikat_Bus_Fleet_v1.2.0.apk
 
       - name: 🚀 Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         with:
-          files: Souikat_Bus_Fleet_v1.0.apk
-          name: "إصدار تطبيق أسطول الحافلات APK"
-          tag_name: "v1.1.2"
+          files: Souikat_Bus_Fleet_v1.2.0.apk
+          name: "إصدار تطبيق أسطول الحافلات APK v1.2.0"
+          tag_name: "v1.2.0"
+          make_latest: true
           body: |
             ### 🚌 تطبيق إدارة أسطول حافلات النقل ومتابعة السائقين
             **مؤسسة سويقات أبو طالب**
             
-            - 🎫 بوابة الحجز المباشر وتأكيد التذاكر الإلكترونية
             - 📅 تقويم الحضور والانصراف مع شريط اختيار السائقين السريع
             - 🔄 أنظمة العمل الأربعة (1:1، 1:2، شهر عمل، 2:1) مع الملء التلقائي
-            - 🚌 متابعة حافلات 50 مقعد ونسب الإشغال
+            - 🚌 متابعة حافلات 50 مقعد ونسب الإشغال وحالة الصيانة
             - 💰 حساب وطباعة كشوف الأجور الشهرية والأجر الإضافي
             
-            **📥 رابط تنزيل ملف APK المباشر مرفق بالأسفل.**
+            **📥 رابط تنزيل ملف APK للهواتف مرفق بالأسفل مباشرة.**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
